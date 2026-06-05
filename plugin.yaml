@@ -1,0 +1,6 @@
+name: omnivoice
+version: 0.1.0
+description: "OmniVoice TTS provider for Hermes Agent"
+provides_tts:
+  - omnivoice
+author: NousResearch Hermes / OmniVoice integration

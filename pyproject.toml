@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hermes-omnivoice"
+version = "0.1.0"
+description = "OmniVoice TTS provider plugin for Hermes Agent"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "Apache-2.0"}
+authors = [
+  {name = "Hermes OmniVoice contributors"}
+]
+dependencies = [
+  "PyYAML>=6.0",
+]
+
+[project.optional-dependencies]
+omnivoice = [
+  "soundfile>=0.12",
+  "torch",
+]
+
+[project.entry-points."hermes_agent.plugins"]
+omnivoice = "hermes_omnivoice"
+
+[project.scripts]
+omnivoice-hermes-tts = "hermes_omnivoice.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["hermes_omnivoice*"]
