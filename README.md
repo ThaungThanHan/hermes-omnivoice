@@ -6,6 +6,10 @@ The plugin registers a Hermes TTS provider named `omnivoice`. Once enabled, Herm
 
 ## Install
 
+Send this github link to your hermes agent chat and let it install this plugin to use OmniVoice TTS.
+
+Or
+
 Install OmniVoice and this plugin in the same Python environment that runs Hermes:
 
 ```bash
