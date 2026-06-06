@@ -34,6 +34,8 @@ Hermes' existing text_to_speech flow can synthesize speech through OmniVoice.
 
 ## Install
 
+You can let your Hermes agent install the hermes-omnivoice plugin by itself. Just give it the installation commands or the repository link.
+
 Install the plugin and OmniVoice runtime in the same Python environment that runs Hermes:
 
 ```bash
