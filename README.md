@@ -1,30 +1,54 @@
 # Hermes OmniVoice TTS Plugin
 
-Hermes Agent plugin for [k2-fsa/OmniVoice](https://github.com/k2-fsa/OmniVoice), a local multilingual zero-shot TTS model with voice cloning and voice design support.
+Powered by [k2-fsa/OmniVoice](https://github.com/k2-fsa/OmniVoice) from Xiaomi. 🎙️
 
-The plugin registers a Hermes TTS provider named `omnivoice`. Once enabled, Hermes' existing `text_to_speech` tool and voice-mode delivery can synthesize through OmniVoice.
+OmniVoice is an impressive local multilingual zero-shot TTS model with broad language support, voice cloning, voice design, fine-grained speech controls, and fast inference.
+
+`hermes-omnivoice` brings OmniVoice into [Hermes Agent](https://github.com/NousResearch/hermes-agent) as a community TTS plugin.
+
+Once enabled, the plugin registers a Hermes TTS provider named:
+
+```text
+omnivoice
+```
+
+Hermes' existing text_to_speech flow can synthesize speech through OmniVoice.
+
+## What can it do?
+
+- 🌍 **Multilingual TTS** - generate speech in 600+ languages supported by OmniVoice.
+- 🎭 **Voice design** — describe the voice you want, such as gender, pitch, age, accent, or speaking style.
+- 🧬 **Voice cloning** — use any reference audio to create a similar voice.
+- 🛠️ **Advanced controls** — configure speed, diffusion steps, guidance scale, duration, and more.
+- 🧩 **Hermes-native** — works as a Hermes TTS provider without modifying Hermes core.
+- 💻 **Local inference** — run speech generation locally with OmniVoice.
+
+## Use cases
+
+- Personalized, custom voices for Hermes agents
+- Voice cloning to tune the voice as you desire
+- Marketing and product-demo voiceovers
+- Video narration for tutorials, reels, and explainers
+- Multilingual content creation
+- Creative voice experiments
 
 ## Install
 
-Install OmniVoice and this plugin in the same Python environment that runs Hermes:
+Install the plugin and OmniVoice runtime in the same Python environment that runs Hermes:
 
 ```bash
-pip install git+https://github.com/k2-fsa/OmniVoice.git
-pip install git+https://github.com/ThaungThanHan/hermes-omnivoice.git
-```
-
-Or install as a directory plugin:
-
-```bash
-mkdir -p ~/.hermes/plugins
-git clone https://github.com/ThaungThanHan/hermes-omnivoice.git ~/.hermes/plugins/omnivoice
-```
-
-Enable the plugin and select the provider:
-
-```bash
+pip install "hermes-omnivoice[omnivoice] @ git+https://github.com/ThaungThanHan/hermes-omnivoice.git"
 hermes plugins enable omnivoice
+hermes config set tts.provider omnivoice
 ```
+
+If you only want to install the lightweight plugin package without OmniVoice:
+
+```bash
+pip install "hermes-omnivoice @ git+https://github.com/ThaungThanHan/hermes-omnivoice.git"
+```
+
+## Basic config
 
 Add this to `~/.hermes/config.yaml`:
 
@@ -38,24 +62,56 @@ tts:
     voice: auto
 ```
 
-## Voice Modes
+After changing config, restart Hermes.
 
-OmniVoice supports three modes through the same Hermes provider:
+## Voice modes
+
+OmniVoice supports three main voice modes through this plugin.
+
+### 1. Auto voice
+
+Let OmniVoice pick the voice automatically:
 
 ```yaml
-# Auto voice
 tts:
   provider: omnivoice
   omnivoice:
     voice: auto
+```
 
-# Voice design
+Good for quick testing.
+
+### 2. Voice design
+
+Describe the voice you want:
+
+```yaml
 tts:
   provider: omnivoice
   omnivoice:
     voice: "female, low pitch, british accent"
+```
 
-# Voice cloning
+You can also pass a voice-design instruction at call time:
+
+```text
+instruct:female, low pitch, british accent
+```
+
+Example ideas:
+
+```text
+male, young adult, high pitch
+female, whisper
+older male, deep voice
+female, british accent
+```
+
+### 3. Voice cloning
+
+Use a short reference audio file:
+
+```yaml
 tts:
   provider: omnivoice
   omnivoice:
@@ -63,16 +119,35 @@ tts:
     ref_text: "Transcript of the reference audio"
 ```
 
-Hermes can also pass a voice value at call time. The provider treats:
+Hermes can also pass reference audio at call time:
 
-- `auto`, `default`, or `random` as automatic voice selection.
-- `instruct:female, british accent` as a voice-design instruction.
-- `ref:/path/to/reference.wav` or an existing local file path as reference audio.
-- Any other non-empty string as an OmniVoice `instruct` value.
+```text
+ref:/absolute/path/to/reference.wav
+```
+
+or simply pass an existing local audio-file path as the voice value.
+
+For best results, use a clean reference clip with one speaker, low background noise, and an accurate transcript.
+
+## Runtime voice values
+
+When Hermes passes a `voice` value, the provider handles it like this:
+
+| Voice value | Behavior |
+| --- | --- |
+| `auto` | Automatic voice selection |
+| `default` | Automatic voice selection |
+| `random` | Automatic voice selection |
+| `instruct:female, british accent` | Voice-design instruction |
+| `ref:/path/to/reference.wav` | Reference audio for voice cloning |
+| `/path/to/reference.wav` | Reference audio if the file exists |
+| Any other non-empty string | OmniVoice `instruct` value |
 
 ## Configuration
 
-The provider reads `tts.omnivoice` from `~/.hermes/config.yaml`. Environment variables override config values.
+The provider reads `tts.omnivoice` from `~/.hermes/config.yaml`.
+
+Environment variables override config values.
 
 | Config key | Environment variable | Default |
 | --- | --- | --- |
@@ -91,22 +166,61 @@ The provider reads `tts.omnivoice` from `~/.hermes/config.yaml`. Environment var
 | `load_asr` | `OMNIVOICE_LOAD_ASR` | enabled when `ref_text` is absent |
 | `asr_model` | `OMNIVOICE_ASR_MODEL` | `openai/whisper-large-v3-turbo` |
 
-Generation controls also support `t_shift`, `denoise`, `postprocess_output`, `layer_penalty_factor`, `position_temperature`, and `class_temperature`.
+Generation controls also support:
 
-## Audio Format
+```text
+t_shift
+denoise
+postprocess_output
+layer_penalty_factor
+position_temperature
+class_temperature
+```
 
-OmniVoice generates waveform audio. The plugin writes `wav`, `flac`, and `ogg` directly through `soundfile`. If Hermes requests `mp3`, the plugin uses `ffmpeg` when available; otherwise it writes a `.wav` file and returns that path.
+## Multilingual example
+
+Set a language in your Hermes config:
+
+```yaml
+tts:
+  provider: omnivoice
+  omnivoice:
+    language: th
+```
+
+Then ask Hermes to speak:
+
+```text
+Use text_to_speech to say: สวัสดีครับ นี่คือเสียงจาก OmniVoice
+```
+
+You can also test Chinese, English, Burmese, Japanese, Korean, and other languages supported by OmniVoice.
+
+## Audio format
+
+OmniVoice generates waveform audio.
+
+This plugin can write these formats directly through `soundfile`:
+
+```text
+wav
+flac
+ogg
+```
+
+If Hermes requests `mp3`, the plugin uses `ffmpeg` when available. If `ffmpeg` is not available, it writes a `.wav` file and returns that path.
 
 Install ffmpeg for MP3 output and Telegram voice-bubble conversion:
 
 ```bash
 brew install ffmpeg
-# or: sudo apt install ffmpeg
+# or
+sudo apt install ffmpeg
 ```
 
-## Command-Provider Fallback
+## Command-provider fallback
 
-If you prefer Hermes' config-driven command provider instead of the Python plugin, use OmniVoice's CLI:
+If you prefer Hermes' config-driven command provider instead of the Python plugin, you can use the included wrapper command:
 
 ```yaml
 tts:
@@ -122,6 +236,65 @@ tts:
 
 The `omnivoice-hermes-tts` wrapper is installed by this package. It reads Hermes' `{input_path}` text file and calls the same provider code used by the Python plugin.
 
+The Python plugin is recommended for normal use because it can keep the model loaded during the Hermes session.
+
+## Quick test
+
+Create a text file:
+
+```bash
+echo "Hello from Hermes OmniVoice." > test.txt
+```
+
+Run:
+
+```bash
+omnivoice-hermes-tts \
+  --text-file test.txt \
+  --output test.wav \
+  --voice auto \
+  --format wav
+```
+
+Then play the generated file:
+
+```bash
+open test.wav
+```
+
+On Linux:
+
+```bash
+ffplay test.wav
+```
+
+## Notes
+
+- First generation may take longer because the model needs to download and load.
+- GPU is recommended for faster inference.
+- CPU may work, but can be slow.
+- Voice cloning quality depends heavily on the reference audio quality.
+- Voice design behavior depends on OmniVoice model capabilities.
+
 ## Safety
 
-OmniVoice supports voice cloning. Only clone voices you have the right to use, and follow the OmniVoice model license and local laws.
+OmniVoice supports voice cloning.
+
+Only clone voices you have the right to use. Do not use this plugin to impersonate people, deceive others, bypass verification, or create misleading content.
+
+You are responsible for following the OmniVoice model license and local laws.
+
+## Contributing
+
+Issues, ideas, bug reports, and pull requests are welcome.
+
+Useful contribution ideas:
+
+- More tested config examples
+- Better Hermes setup docs
+- Voice-design presets
+- Language examples
+- Tests for provider behavior
+- Troubleshooting notes for CUDA, CPU, macOS, and Linux
+
+If you try this plugin, feedback is warmly welcome.

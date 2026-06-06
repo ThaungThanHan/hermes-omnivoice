@@ -14,12 +14,14 @@ authors = [
 ]
 dependencies = [
   "PyYAML>=6.0",
+  "soundfile>=0.12",
 ]
 
 [project.optional-dependencies]
 omnivoice = [
-  "soundfile>=0.12",
   "torch",
+  "torchaudio",
+  "omnivoice @ git+https://github.com/k2-fsa/OmniVoice.git"
 ]
 
 [project.entry-points."hermes_agent.plugins"]
