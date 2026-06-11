@@ -4,7 +4,7 @@ Powered by [k2-fsa/OmniVoice](https://github.com/k2-fsa/OmniVoice) from Xiaomi. 
 
 OmniVoice is an impressive local multilingual zero-shot TTS model with broad language support, voice cloning, voice design, fine-grained speech controls, and fast inference.
 
-`hermes-omnivoice` brings OmniVoice into [Hermes Agent](https://github.com/NousResearch/hermes-agent) as a community TTS plugin.
+`hermes-omnivoice` is a community plugin that integrates Xiaomi's OmniVoice TTS with Hermes Agent, adding an omnivoice TTS provider for multilingual speech synthesis, voice design, and voice cloning.
 
 Once enabled, the plugin registers a Hermes TTS provider named:
 
